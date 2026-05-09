@@ -15,29 +15,37 @@ mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("MongoDB Connected"))
 .catch(err => console.log(err));
 
-const taskSchema = new mongoose.Schema({
-    task: String
+const noteSchema = new mongoose.Schema({
+    title: String,
+    description: String
 });
 
-const Task = mongoose.model("Task", taskSchema);
+const Note = mongoose.model("Note", noteSchema);
 
-app.get("/tasks", async (req, res) => {
-    const tasks = await Task.find();
-    res.json(tasks);
+app.get("/notes", async (req, res) => {
+    const notes = await Note.find();
+    res.json(notes);
 });
 
-app.post("/tasks", async (req, res) => {
-    const newTask = new Task({
-        task: req.body.task
+app.post("/notes", async (req, res) => {
+    const newNote = new Note({
+        title: req.body.title,
+        description: req.body.description
     });
 
-    await newTask.save();
-    res.json({ message: "Task Added" });
+    await newNote.save();
+
+    res.json({
+        message: "Note Added Successfully"
+    });
 });
 
-app.delete("/tasks/:id", async (req, res) => {
-    await Task.findByIdAndDelete(req.params.id);
-    res.json({ message: "Task Deleted" });
+app.delete("/notes/:id", async (req, res) => {
+    await Note.findByIdAndDelete(req.params.id);
+
+    res.json({
+        message: "Note Deleted"
+    });
 });
 
 const PORT = process.env.PORT || 3000;

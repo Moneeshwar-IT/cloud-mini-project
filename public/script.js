@@ -1,52 +1,69 @@
-const apiUrl = "/tasks";
+const apiUrl = "/notes";
 
-async function loadTasks() {
+async function loadNotes() {
     const response = await fetch(apiUrl);
-    const tasks = await response.json();
+    const notes = await response.json();
 
-    const taskList = document.getElementById("taskList");
-    taskList.innerHTML = "";
+    const notesContainer = document.getElementById("notesContainer");
 
-    tasks.forEach(task => {
-        const li = document.createElement("li");
+    notesContainer.innerHTML = "";
 
-        li.innerHTML = `
-            ${task.task}
-            <button onclick="deleteTask('${task._id}')">Delete</button>
+    notes.forEach(note => {
+
+        const div = document.createElement("div");
+
+        div.className = "note";
+
+        div.innerHTML = `
+            <h3>${note.title}</h3>
+            <p>${note.description}</p>
+
+            <button onclick="deleteNote('${note._id}')">
+                Delete
+            </button>
         `;
 
-        taskList.appendChild(li);
+        notesContainer.appendChild(div);
     });
 }
 
-async function addTask() {
-    const taskInput = document.getElementById("taskInput");
+async function addNote() {
 
-    if(taskInput.value === "") {
-        alert("Enter a task");
+    const title = document.getElementById("title").value;
+
+    const description = document.getElementById("description").value;
+
+    if(title === "" || description === "") {
+        alert("Please fill all fields");
         return;
     }
 
     await fetch(apiUrl, {
         method: "POST",
+
         headers: {
             "Content-Type": "application/json"
         },
+
         body: JSON.stringify({
-            task: taskInput.value
+            title,
+            description
         })
     });
 
-    taskInput.value = "";
-    loadTasks();
+    document.getElementById("title").value = "";
+    document.getElementById("description").value = "";
+
+    loadNotes();
 }
 
-async function deleteTask(id) {
+async function deleteNote(id) {
+
     await fetch(`${apiUrl}/${id}`, {
         method: "DELETE"
     });
 
-    loadTasks();
+    loadNotes();
 }
 
-loadTasks();
+loadNotes();
